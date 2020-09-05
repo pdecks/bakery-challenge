@@ -1,6 +1,6 @@
 # chalk-arithmetic
 
-You can execute the tests in OrderTest using Maven:
+You can execute the tests in `OrderTest` using Maven:
 
 ```mvn test```
 

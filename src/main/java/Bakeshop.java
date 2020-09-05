@@ -2,6 +2,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonStreamParser;
+import com.google.gson.internal.Streams;
+import com.google.gson.stream.JsonReader;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -59,34 +61,30 @@ public class Bakeshop {
     // populate inventory from products-data.json
     public void generateInventoryFromJsonFile() throws IOException {
         FileReader fileReader = new FileReader(ABS_FILE_PATH);
-        JsonStreamParser jsonStreamParser = new JsonStreamParser(fileReader);
+        JsonReader jsonParser = new JsonReader(fileReader);
 
-        // definitely would optimize this in the future to use annotations (like Jackson)
-        // wanted to try out a different library (GSON)
-        while(jsonStreamParser.hasNext()) {
-            JsonObject root = jsonStreamParser.next().getAsJsonObject();
-            JsonArray jsonArray = root.getAsJsonArray("treats");
-            // add treats to inventory
-            for (JsonElement element : jsonArray) {
-                BulkPricing bulkPricing = null;
-                JsonObject treatObject = element.getAsJsonObject();
-                int id = treatObject.get("id").getAsInt();
-                String name = treatObject.get("name").getAsString();
-                String imageURL = treatObject.get("imageURL").getAsString();
-                float price = treatObject.get("price").getAsFloat();
+        JsonObject root = Streams.parse(jsonParser).getAsJsonObject();
+        JsonArray jsonArray = root.getAsJsonArray("treats");
+        // add treats to inventory
+        for (JsonElement element : jsonArray) {
+            BulkPricing bulkPricing = null;
+            JsonObject treatObject = element.getAsJsonObject();
+            int id = treatObject.get("id").getAsInt();
+            String name = treatObject.get("name").getAsString();
+            String imageURL = treatObject.get("imageURL").getAsString();
+            float price = treatObject.get("price").getAsFloat();
 
-                // handle nested inner object
-                if (!treatObject.get("bulkPricing").isJsonNull()) {
-                    JsonObject bulkPricingObject = treatObject.getAsJsonObject("bulkPricing");
-                    int amount = bulkPricingObject.get("amount").getAsInt();
-                    float totalPrice = bulkPricingObject.get("totalPrice").getAsFloat();
-                    bulkPricing = new BulkPricing(amount, totalPrice);
-                }
-
-                // create treat with bulk pricing
-                Treat treat = new Treat(id, name, imageURL, price, bulkPricing);
-                inventory.addTreat(treat);
+            // handle nested inner object
+            if (!treatObject.get("bulkPricing").isJsonNull()) {
+                JsonObject bulkPricingObject = treatObject.getAsJsonObject("bulkPricing");
+                int amount = bulkPricingObject.get("amount").getAsInt();
+                float totalPrice = bulkPricingObject.get("totalPrice").getAsFloat();
+                bulkPricing = new BulkPricing(amount, totalPrice);
             }
+
+            // create treat with bulk pricing
+            Treat treat = new Treat(id, name, imageURL, price, bulkPricing);
+            inventory.addTreat(treat);
         }
 
         fileReader.close();

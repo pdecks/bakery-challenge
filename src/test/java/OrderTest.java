@@ -6,6 +6,7 @@ import org.junit.runner.Result;
 import org.junit.runner.notification.Failure;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.time.LocalDate;
 
 public class OrderTest {
@@ -15,7 +16,7 @@ public class OrderTest {
     // run via JUnit tests
     // @Before to setup bakeshop
     @BeforeClass
-    public static void setUp() throws FileNotFoundException {
+    public static void setUp() throws IOException {
         if (setUpComplete) return;
         System.out.println("Instantiating bakeshop ...\n");
         bakeshop = new Bakeshop();

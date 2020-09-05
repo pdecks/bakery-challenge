@@ -1,1 +1,1 @@
-# bakery-challenge
+# chalk-arithmetic

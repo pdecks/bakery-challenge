@@ -5,6 +5,7 @@ import com.google.gson.JsonStreamParser;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -56,7 +57,7 @@ public class Bakeshop {
     }
 
     // populate inventory from products-data.json
-    public void generateInventoryFromJsonFile() throws FileNotFoundException {
+    public void generateInventoryFromJsonFile() throws IOException {
         FileReader fileReader = new FileReader(ABS_FILE_PATH);
         JsonStreamParser jsonStreamParser = new JsonStreamParser(fileReader);
 
@@ -87,6 +88,8 @@ public class Bakeshop {
                 inventory.addTreat(treat);
             }
         }
+
+        fileReader.close();
     }
 
 }

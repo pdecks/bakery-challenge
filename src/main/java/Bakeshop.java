@@ -58,33 +58,34 @@ public class Bakeshop {
 
     // populate inventory from products-data.json
     public void generateInventoryFromJsonFile() throws IOException {
-        FileReader fileReader = new FileReader(ABS_FILE_PATH);
-        JsonReader jsonParser = new JsonReader(fileReader);
-        JsonArray treatsArray = Streams.parse(jsonParser).getAsJsonObject().getAsJsonArray("treats");
+        try (FileReader fileReader = new FileReader(ABS_FILE_PATH)) {
+            JsonReader jsonParser = new JsonReader(fileReader);
+            JsonArray treatsArray = Streams.parse(jsonParser).getAsJsonObject().getAsJsonArray("treats");
 
-        // add treats to inventory
-        for (JsonElement element : treatsArray) {
-            BulkPricing bulkPricing = null;
-            JsonObject treatObject = element.getAsJsonObject();
-            int id = treatObject.get("id").getAsInt();
-            String name = treatObject.get("name").getAsString();
-            String imageURL = treatObject.get("imageURL").getAsString();
-            float price = treatObject.get("price").getAsFloat();
+            // add treats to inventory
+            for(JsonElement element : treatsArray) {
+                BulkPricing bulkPricing = null;
+                JsonObject treatObject = element.getAsJsonObject();
+                int id = treatObject.get("id").getAsInt();
+                String name = treatObject.get("name").getAsString();
+                String imageURL = treatObject.get("imageURL").getAsString();
+                float price = treatObject.get("price").getAsFloat();
 
-            // handle nested inner object
-            if (!treatObject.get("bulkPricing").isJsonNull()) {
-                JsonObject bulkPricingObject = treatObject.getAsJsonObject("bulkPricing");
-                int amount = bulkPricingObject.get("amount").getAsInt();
-                float totalPrice = bulkPricingObject.get("totalPrice").getAsFloat();
-                bulkPricing = new BulkPricing(amount, totalPrice);
+                // handle nested inner object
+                if (!treatObject.get("bulkPricing").isJsonNull()) {
+                    JsonObject bulkPricingObject = treatObject.getAsJsonObject("bulkPricing");
+                    int amount = bulkPricingObject.get("amount").getAsInt();
+                    float totalPrice = bulkPricingObject.get("totalPrice").getAsFloat();
+                    bulkPricing = new BulkPricing(amount, totalPrice);
+                }
+
+                // create treat with bulk pricing
+                Treat treat = new Treat(id, name, imageURL, price, bulkPricing);
+                inventory.addTreat(treat);
             }
-
-            // create treat with bulk pricing
-            Treat treat = new Treat(id, name, imageURL, price, bulkPricing);
-            inventory.addTreat(treat);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        fileReader.close();
     }
 
 }

@@ -60,11 +60,10 @@ public class Bakeshop {
     public void generateInventoryFromJsonFile() throws IOException {
         FileReader fileReader = new FileReader(ABS_FILE_PATH);
         JsonReader jsonParser = new JsonReader(fileReader);
+        JsonArray treatsArray = Streams.parse(jsonParser).getAsJsonObject().getAsJsonArray("treats");
 
-        JsonObject root = Streams.parse(jsonParser).getAsJsonObject();
-        JsonArray jsonArray = root.getAsJsonArray("treats");
         // add treats to inventory
-        for (JsonElement element : jsonArray) {
+        for (JsonElement element : treatsArray) {
             BulkPricing bulkPricing = null;
             JsonObject treatObject = element.getAsJsonObject();
             int id = treatObject.get("id").getAsInt();
